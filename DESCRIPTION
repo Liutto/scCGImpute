@@ -1,0 +1,12 @@
+Package: scCGImpute
+Type: Package
+Title: An imputation method for single-cell RNA sequencing data based on similarities between cells and relationships among genes
+Version: 0.1.0
+Author: Tiantian Liu
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Single-cell RNA sequencing (scRNA-seq) has become a powerful technique to investigate cellular heterogeneity and complexity in various fields by revealing the gene expression status of individual cells. Despite the undeniable benefits of scRNA-seq, it is not immune to its inherent limitations, such as sparsity and noise, which would hinder downstream analysis. In this paper, we introduce scCGImpute, a model-based approach for addressing the challenges of sparsity in scRNA-seq data through imputation.
+Depends:parallel,penalized,survival,doParallel,foreach,iterators,randomForest,rpca,kernlab
+License: GPL
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
