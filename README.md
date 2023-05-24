@@ -6,8 +6,11 @@ Single-cell RNA sequencing (scRNA-seq) has become a powerful technique to invest
 
 ## Quick start
 scCGImpute(
+
   count_matrix = count_matrix, #scRNA-seq data
+  
   out_dir = out_dir,           #full path to output directory
+  
   Kcluster = 3                 #the number of cell type
+  
   )    
-)
