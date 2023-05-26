@@ -16,7 +16,6 @@ find_hv_genes = function(count, I, J){
 find_neighbors = function(count_hv, J, Kcluster = NULL, 
                           ncores, cell_labels = NULL){
 
-    print("dimension reduction ...")
     if(J < 5000){
       var_thre = 0.4
       pca = prcomp(t(count_hv))
@@ -38,7 +37,6 @@ find_neighbors = function(count_hv, J, Kcluster = NULL,
     clnum<-detectCores()  
     cl <- makeCluster(getOption("cl.cores", clnum)) 
     
-    print("calculating cell distances ...")
     dist_cells_list = parLapply(cl,1:J, function(id1){
       d = sapply(1:id1, function(id2){
         sse = sum((mat_pcs[, id1] - mat_pcs[, id2])^2)
@@ -123,7 +121,6 @@ update_gmm_pars = function(x, wt){
 
 ### estimate parameters in the mixture distribution
 get_mix = function(xdata, point){
-  # print("get_mix start...")
   inits = rep(0, 5)
   inits[1] = sum(xdata == point)/length(xdata)
   if (inits[1] == 0) {inits[1] = 0.01}
@@ -154,7 +151,6 @@ get_mix = function(xdata, point){
 }
 get_mix_parameters =function (count, point = log10(1.01), path, ncores = 8) 
   {
-    print("get_mix_parameters start!")
     count = as.matrix(count)
     null_genes = which(abs(rowSums(count) - point * ncol(count)) < 1e-10)
     no_cores <- detectCores(no_cores) - 1  # 检测核数，并设置使用的数量
@@ -176,7 +172,6 @@ get_mix_parameters =function (count, point = log10(1.01), path, ncores = 8)
     parslist = Reduce(rbind, parslist)#Reduce使用一个二元函数依次组合给定向量的元素和可能给定的初始值
     colnames(parslist) = c("rate", "alpha", "beta", "mu", "sigma")
     saveRDS(parslist, file = path)
-    print("get_mix_parameters end!")
     return(0)
 }
 rmix =function (pars, n) {
@@ -199,7 +194,6 @@ imputation_model = function(count, point, drop_thre = 0.5, Kcluster = Kcluster,
   #pca  cell
   # find highly variable genes -> 表达量差别最大的基因
   count_hv = find_hv_genes(count, I, J)  #genes×cells
-  print("searching candidate neighbors ... ")
   if(Kcluster == 1){
     clust = rep(1, J)
     if(J < 5000){
@@ -238,7 +232,6 @@ imputation_model = function(count, point, drop_thre = 0.5, Kcluster = Kcluster,
 
     stopCluster(cl)
   }else{
-    print("inferring cell similarities ...")
     set.seed(Kcluster)
     neighbors_res = find_neighbors(count_hv = count_hv, J = J, 
                                    Kcluster = Kcluster, ncores = ncores)
@@ -256,21 +249,17 @@ imputation_model = function(count, point, drop_thre = 0.5, Kcluster = Kcluster,
                        point = log10(1.01),
                        path = paste0(out_dir, "pars", cc, ".rds"), ncores = ncores)
 
-    print("get_mix_parameters end!")
     cells = which(clust == cc)
     if(length(cells) <= 1) { next }
     parslist = readRDS(paste0(out_dir, "pars", cc, ".rds"))
 
-    print("searching for valid genes ...")
     valid_genes = find_va_genes(parslist, subcount = count[, cells])#分别对每一类型细胞进行处理
-    print("searching for valid genes ...end")
     if(length(valid_genes) <= 10){ next }
     subcount = count[valid_genes, cells, drop = FALSE]
     Ic = length(valid_genes)
     Jc = ncol(subcount)  #该类细胞的数目
     parslist = parslist[valid_genes, , drop = FALSE]
 
-    print("droprate...")
 
     #缺失率   一个基因一个基因地计算
     droprate = t(sapply(1:Ic, function(i) {
