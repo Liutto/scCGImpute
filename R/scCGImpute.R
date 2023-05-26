@@ -19,9 +19,7 @@ scCGImpute <-
   function (count_matrix, out_dir, Kcluster = NULL)
   {
 
-    print("reading in raw count matrix ...")
     dir.create(out_dir, recursive = TRUE)
-
     raw_count = as.matrix(count_matrix)
     zeroproportion = length(which(raw_count ==0))/(dim(raw_count)[1]*dim(raw_count)[2])
     print(paste("number of genes in raw count matrix", nrow(raw_count)))
@@ -34,7 +32,6 @@ scCGImpute <-
     }
     count_lnorm = log10(raw_count + 1.01)
 
-    print("reading finished!")
     genenames = rownames(count_lnorm)
     cellnames = colnames(count_lnorm)
     count = as.matrix(count_lnorm)
@@ -49,7 +46,6 @@ scCGImpute <-
     count_imp = 10^count_imp - 1.01
     rownames(count_imp) = genenames
     colnames(count_imp) = cellnames
-    print("writing imputed count matrix ...")
     count_imp = sweep(count_imp, MARGIN = 2, totalCounts_by_cell/10^6,
                       FUN = "*")
     count_imp = round(count_imp, digits = 2)
